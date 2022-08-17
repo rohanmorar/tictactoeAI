@@ -87,7 +87,7 @@ def result(board, action):
     raise NotImplementedError
 
 ''' Returns True if there is a winner by 3 in a row'''
-def isRowWinner(board):
+def rowWinner(board):
     rowItems = set()
     countItems = 0
     rows = len(board)
@@ -101,12 +101,12 @@ def isRowWinner(board):
                 rowItems.add(board[row][col])
                 countItems += 1
         if len(rowItems) == 1 and countItems == rowLength:
-            return True
+            return rowItems.pop()
         rowItems = set()
         countItems = 0
     return False
 
-def isColWinner(board):
+def colWinner(board):
     colItems = set()
     countItems = 0
     rows = len(board)
@@ -120,12 +120,12 @@ def isColWinner(board):
                 colItems.add(board[col][row])
                 countItems += 1
         if len(colItems) == 1 and countItems == rowLength:
-            return True
+            return colItems.pop()
         colItems = set()
         countItems = 0
     return False
     
-def isDiagWinner(board):
+def diagWinner(board):
     diagItems = set()
     countItems = 0
     boardLen = len(board)
@@ -137,7 +137,7 @@ def isDiagWinner(board):
             diagItems.add(board[i][i])
             countItems += 1
     if len(diagItems) == 1 and countItems == boardLen:
-        return True
+        return diagItems.pop()
     diagItems = set()
     countItems = 0    
     for i in range(boardLen):
@@ -147,48 +147,48 @@ def isDiagWinner(board):
             diagItems.add(board[i][boardLen - i - 1])
             countItems += 1
     if len(diagItems) == 1 and countItems == boardLen:
-        return True
+        return diagItems.pop()
     return False
         
 def winner(board):
     """
     Returns the winner of the game, if there is one.
     """
-    # if checkRows(board) == X or checkCols(board) == X or checkDiagonals(board) == X:
-    #     return X
-    # elif checkRows(board) == O or checkCols(board) == O or checkDiagonals(board) == O:
-    #     return O
-    # else:
-    #     return None
+    if rowWinner(board) is not False:
+        return rowWinner(board)
+    elif colWinner(board) is not False:
+        return colWinner(board)
+    elif diagWinner(board) is not False:
+        return diagWinner(board)
+    else:
+        return None
 
     raise NotImplementedError
 
 def terminal(board):
     """
-    Returns True if game is over, False otherwise.
+    Returns True if game is over (by full board - no winner, or by full board - with winner), False otherwise.
     """
-    # if isFull(board):
-    #     return True
-    # if winner(board):
-    #     return True
-    # else:
-    #     return False
+    if isFull(board):
+        return True
+    if winner(board):
+        return True
+    else:
+        return False
     raise NotImplementedError
-
 
 def utility(board):
     """
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     """
-    # if winner(board) == X:
-    #     return 1
-    # elif winner(board) == O:
-    #     return -1
-    # else:
-    #     return 0
+    if winner(board) == X:
+        return 1
+    elif winner(board) == O:
+        return -1
+    else:
+        return 0
     
     raise NotImplementedError
-
 
 def minimax(board):
     """
