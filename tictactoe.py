@@ -41,11 +41,9 @@ def countPiece(board, piece):
             if col == piece:
                 count += 1
     return count
-                
+
+"""Returns player who has the next turn on a board."""               
 def player(board):
-    """
-    Returns player who has the next turn on a board.
-    """
     if isFull(board): 
         return "terminal board reached"
     if isEmpty(board): # board is empty - X makes the first move
@@ -57,10 +55,9 @@ def player(board):
             
     raise NotImplementedError
 
+"""Returns set of all possible actions (i, j) available on the board."""
 def actions(board):
-    """
-    Returns set of all possible actions (i, j) available on the board.
-    """
+
     allMoves = set()
     for i in range(len(board)):
         for j in range(len(board[0])):
@@ -69,10 +66,8 @@ def actions(board):
     return allMoves
     raise NotImplementedError
 
+"""Returns the board that results from making move (i, j) on the board."""
 def result(board, action):
-    """
-    Returns the board that results from making move (i, j) on the board.
-    """
     new_state = copy.deepcopy(board)
     row, col = action
     thisPlayer = player(board)
@@ -106,6 +101,7 @@ def rowWinner(board):
         countItems = 0
     return False
 
+''' Returns True if there is a winner by 3 in a column'''
 def colWinner(board):
     colItems = set()
     countItems = 0
@@ -124,7 +120,8 @@ def colWinner(board):
         colItems = set()
         countItems = 0
     return False
-    
+
+''' Returns True if there is a winner by 3 in either diagonal'''    
 def diagWinner(board):
     diagItems = set()
     countItems = 0
@@ -149,11 +146,9 @@ def diagWinner(board):
     if len(diagItems) == 1 and countItems == boardLen:
         return diagItems.pop()
     return False
-        
+
+"""Returns the winner of the game, if there is one."""        
 def winner(board):
-    """
-    Returns the winner of the game, if there is one.
-    """
     if rowWinner(board) is not False:
         return rowWinner(board)
     elif colWinner(board) is not False:
@@ -165,10 +160,8 @@ def winner(board):
 
     raise NotImplementedError
 
+"""Returns True if game is over (by full board - no winner, or by full board - with winner), False otherwise."""
 def terminal(board):
-    """
-    Returns True if game is over (by full board - no winner, or by full board - with winner), False otherwise.
-    """
     if isFull(board):
         return True
     if winner(board):
@@ -177,10 +170,8 @@ def terminal(board):
         return False
     raise NotImplementedError
 
+"""Returns 1 if X has won the game, -1 if O has won, 0 otherwise."""
 def utility(board):
-    """
-    Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
-    """
     if winner(board) == X:
         return 1
     elif winner(board) == O:
@@ -190,8 +181,36 @@ def utility(board):
     
     raise NotImplementedError
 
+def max_value(board):
+    v = -math.inf
+    if terminal(board):
+        return utility(board)
+    for action in actions(board):
+        v = max(v, min_value(result(board, action)))
+    return v
+
+def min_value(board):
+    v = math.inf
+    if terminal(board):
+        return utility(board)
+    for action in actions(board):
+        v = min(v, max_value(result(board, action)))
+    return v
+
+"""Returns the optimal action for the current player on the board."""
 def minimax(board):
-    """
-    Returns the optimal action for the current player on the board.
-    """
-    raise NotImplementedError
+    if terminal(board):
+        return None
+    elif player(board) == X:
+        plays = []
+        for action in actions(board):
+            plays.append([min_value(result(board, action)), action])
+        return sorted(plays, key=lambda x: x[0], reverse = True)[0][1]
+
+    elif player(board) == O:
+        plays = []
+        for action in actions(board):
+            plays.append([max_value(result(board, action)), action])
+        return sorted(plays, key=lambda x: x[0])[0][1]
+        
+
